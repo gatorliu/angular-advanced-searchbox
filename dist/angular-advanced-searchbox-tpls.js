@@ -17,6 +17,8 @@ angular.module('angular-advanced-searchbox', [])
             scope: {
                 model: '=ngModel',
                 parameters: '=',
+                defaultparams: '=',
+                enter: '=',
                 placeholder: '@'
             },
             replace: true,
@@ -29,11 +31,23 @@ angular.module('angular-advanced-searchbox', [])
                     $scope.searchParams = [];
                     $scope.searchQuery = '';
                     $scope.setSearchFocus = false;
+                    $scope.Enter = $scope.enter;
                     var searchThrottleTimer;
                     var changeBuffer = [];
+                    if ($scope.defaultparams) {
+                       if (!$scope.defaultparams.query) {
+                          $scope.defaultparams.query = '';
+                       }
+                    } else {
+                        $scope.defaultparams = {};
+                    }
+                    $scope.model = angular.copy($scope.defaultparams);
+
+                    $scope.$watch('defaultparams', function () {
+                       $scope.model = angular.copy($scope.defaultparams);
+                    });
 
                     $scope.$watch('model', function (newValue, oldValue) {
-
                         if(angular.equals(newValue, oldValue))
                             return;
 
@@ -62,6 +76,9 @@ angular.module('angular-advanced-searchbox', [])
                         });
                     }, true);
 
+                    $scope.isDefault = function () {
+                        return angular.equals($scope.defaultparams, $scope.model)
+                    }
                     $scope.searchParamValueChanged = function (param) {
                         updateModel('change', param.key, param.value);
                     };
@@ -76,6 +93,7 @@ angular.module('angular-advanced-searchbox', [])
 
                         var searchParam = $scope.searchParams[index];
                         searchParam.editMode = true;
+                        $scope.focus = true; // by GatorLiu
                     };
 
                     $scope.leaveEditMode = function(index) {
@@ -112,11 +130,18 @@ angular.module('angular-advanced-searchbox', [])
                                 key: searchParam.key,
                                 name: searchParam.name,
                                 placeholder: searchParam.placeholder,
+                                type: searchParam.type, // GatorLiu
+                                options : searchParam.options, // GatorLiu
+                                required:searchParam.required,
                                 value: value || '',
                                 editMode: enterEditModel
                             }
                         );
-
+                        if (value === undefined) {
+                           $timeout( function(){
+                              $scope.focus = true;
+                           })
+                        }
                         updateModel('add', searchParam.key, value);
                     };
 
@@ -125,6 +150,7 @@ angular.module('angular-advanced-searchbox', [])
                             return;
 
                         var searchParam = $scope.searchParams[index];
+                        if (searchParam.required) return;
                         $scope.searchParams.splice(index, 1);
 
                         updateModel('delete', searchParam.key);
@@ -135,6 +161,8 @@ angular.module('angular-advanced-searchbox', [])
                         $scope.searchQuery = '';
                         
                         $scope.model = {};
+                        $scope.model= angular.copy($scope.defaultparams);
+                        $scope.focus = false;
                     };
 
                     $scope.editPrevious = function(currentIndex) {
@@ -142,10 +170,14 @@ angular.module('angular-advanced-searchbox', [])
                             $scope.leaveEditMode(currentIndex);
 
                         //TODO: check if index == 0 -> what then?
+                        console.log(currentIndex)
                         if (currentIndex > 0) {
                             $scope.enterEditMode(currentIndex - 1);
+                        //} else if (currentIndex === undefined) {
+                        //    $scope.enterEditMode($scope.searchParams.length - 1);
                         } else if ($scope.searchParams.length > 0) {
                             $scope.enterEditMode($scope.searchParams.length - 1);
+                        //    $scope.setSearchFocus = true;
                         }
                     };
 
@@ -167,12 +199,30 @@ angular.module('angular-advanced-searchbox', [])
                         var handledKeys = [8, 9, 13, 37, 39];
                         if (handledKeys.indexOf(e.which) === -1)
                             return;
-
-                        var cursorPosition = getCurrentCaretPosition(e.target);
+/* 
+ * Most browsers( IE, firefox, safari..) not suport html5 input type 'date',
+                        if (e.target.type == 'date'){
+                           if (e.which == 13) { // enter
+                              $scope.editNext(searchParamIndex);
+                           }
+                           return;
+                        }
+*/
+                        try{
+                           var notSupportType  = false;
+                           var cursorPosition = getCurrentCaretPosition(e.target);
+                        } catch(e) {
+                           notSupportType = true; 
+                        }
 
                         if (e.which == 8) { // backspace
-                            if (cursorPosition === 0)
-                                $scope.editPrevious(searchParamIndex);
+                            if ( notSupportType || cursorPosition === 0) {
+                                e.preventDefault();
+                                if (searchParamIndex == 0)
+                                    $scope.editNext(searchParamIndex);
+                                else
+                                    $scope.editPrevious(searchParamIndex);
+                            }
 
                         } else if (e.which == 9) { // tab
                             if (e.shiftKey) {
@@ -236,6 +286,7 @@ angular.module('angular-advanced-searchbox', [])
                             });
 
                             changeBuffer.length = 0;
+                            //$scope.focus = true; // by GatorLiu for <select> Click 
                         }, 500);
                     }
 
@@ -329,7 +380,48 @@ angular.module('angular-advanced-searchbox').run(['$templateCache', function($te
   'use strict';
 
   $templateCache.put('angular-advanced-searchbox.html',
-    "<div class=advancedSearchBox ng-class={active:focus} ng-init=\"focus = false\" ng-click=\"!focus ? setSearchFocus = true : null\"><span ng-show=\"searchParams.length < 1 && searchQuery.length === 0\" class=\"search-icon glyphicon glyphicon-search\"></span> <a ng-href=\"\" ng-show=\"searchParams.length > 0 || searchQuery.length > 0\" ng-click=removeAll() role=button><span class=\"remove-all-icon glyphicon glyphicon-trash\"></span></a><div><div class=search-parameter ng-repeat=\"searchParam in searchParams\"><a ng-href=\"\" ng-click=removeSearchParam($index) role=button><span class=\"remove glyphicon glyphicon-trash\"></span></a><div class=key>{{searchParam.name}}:</div><div class=value><span ng-if=!searchParam.editMode ng-click=enterEditMode($index)>{{searchParam.value}}</span> <input name=value nit-auto-size-input nit-set-focus=searchParam.editMode ng-keydown=\"keydown($event, $index)\" ng-blur=leaveEditMode($index) ng-if=searchParam.editMode ng-change=searchParamValueChanged(searchParam) ng-model=searchParam.value placeholder=\"{{searchParam.placeholder}}\"></div></div><input name=searchbox class=search-parameter-input nit-auto-size-input nit-set-focus=setSearchFocus ng-keydown=keydown($event) placeholder={{placeholder}} ng-focus=\"focus = true\" ng-blur=\"focus = false\" typeahead-on-select=\"typeaheadOnSelect($item, $model, $label)\" typeahead=\"parameter as parameter.name for parameter in parameters | filter:isUnsedParameter | filter:{name:$viewValue} | limitTo:8\" ng-change=searchQueryChanged(searchQuery) ng-model=\"searchQuery\"></div><div class=search-parameter-suggestions ng-show=\"parameters && focus\"><span class=title>Parameter Suggestions:</span> <span class=search-parameter ng-repeat=\"param in parameters | filter:isUnsedParameter | limitTo:8\" ng-mousedown=addSearchParam(param)>{{param.name}}</span></div></div>"
+    "<div class=advancedSearchBox ng-class={active:focus} ng-init=\"focus = false\" ng-click=\"!focus ? setSearchFocus = true : null\"><form ng-submit=Enter()><span ng-show=\"isDefault() && searchQuery.length === 0\" class=\"search-icon fa fa-search\"></span> <a ng-href=\"\" ng-hide=\"isDefault() && searchQuery.length === 0\" ng-click=removeAll() role=button><span class=\"remove-all-icon fa fa-refresh\"></span></a><div><div class=search-parameter ng-repeat=\"searchParam in searchParams\"><a ng-href=\"\" ng-click=removeSearchParam($index) role=button ng-hide=searchParam.required><span class=\"remove fa fa-trash\"></span></a> <a ng-href=\"\" ng-click=\"\" role=button ng-show=searchParam.required><span class=remove></span></a><div class=key>{{searchParam.name}}:</div><div class=value ng-if=\"searchParam.type != 'list'\"><span ng-if=!searchParam.editMode ng-click=enterEditMode($index)>&nbsp;{{(searchParam.type == 'date') ? (searchParam.value| date: \"yyyy-MM-dd\"): searchParam.value}}</span> <input name=value type={{searchParam.type}} ng-model-options=\"{ timezone: '+0000' }\" nit-set-focus=searchParam.editMode ng-keydown=\"keydown($event, $index)\" ng-blur=leaveEditMode($index) ng-if=searchParam.editMode ng-change=searchParamValueChanged(searchParam) ng-model=searchParam.value placeholder=\"{{searchParam.placeholder}}\"></div><div class=value ng-if=\"searchParam.type == 'list'\"><span ng-if=!searchParam.editMode ng-click=enterEditMode($index)>&nbsp;{{searchParam.value.cname || searchParam.value.name}}</span><select nit-set-focus=searchParam.editMode ng-keydown=\"keydown($event, $index)\" ng-blur=leaveEditMode($index) ng-if=searchParam.editMode ng-change=searchParamValueChanged(searchParam) ng-model=searchParam.value ng-options=\"m.cname || m.name for m in searchParam.options\"></div></div><input name=searchbox class=search-parameter-input nit-auto-size-input nit-set-focus=setSearchFocus ng-keydown=keydown($event) placeholder={{placeholder}} ng-focus=\"focus = true\" ng-blur=\"focus = false\" typeahead-on-select=\"typeaheadOnSelect($item, $model, $label)\" typeahead=\"parameter as parameter.name for parameter in parameters | filter:isUnsedParameter | filter:{name:$viewValue} | limitTo:8\" ng-change=searchQueryChanged(searchQuery) ng-model=\"searchQuery\"></div><div class=search-parameter-suggestions ng-show=\"(parameters | filter:isUnsedParameter).length && focus\"><span class=title>Parameter Suggestions:</span> <span class=search-parameter ng-repeat=\"param in parameters | filter:isUnsedParameter | limitTo:8\" ng-mousedown=addSearchParam(param)>{{param.name}}</span></div></form></div>"
+  );
+
+
+  $templateCache.put('demo.html',
+    "<!DOCTYPE html><html ng-app=app lang=en><head><meta charset=utf-8><meta http-equiv=X-UA-Compatible content=\"IE=edge\"><meta name=viewport content=\"width=device-width,initial-scale=1\"><meta name=description content=\"A directive for AngularJS providing a advanced visual search box\"><meta name=author content=\"Daniel Nauck\"><link rel=icon href=favicon.ico><title>Angular Advanced Searchbox</title><link rel=stylesheet href=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css><link rel=stylesheet href=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css><link rel=stylesheet href=https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css><link rel=stylesheet href=angular-advanced-searchbox.css><script src=http://code.jquery.com/jquery-2.1.1.min.js></script><script src=https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js></script><script src=https://rawgit.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.13.0.min.js></script><script src=angular-advanced-searchbox.js></script><script>var app = angular.module('app', ['ui.bootstrap', 'angular-advanced-searchbox']);\n" +
+    "\n" +
+    "\n" +
+    "      app.controller('DemoController', function($scope, $filter) {\n" +
+    "        $scope.availableSearchParams = [\n" +
+    "          { key: \"name\", name: \"Name\", placeholder: \"Name...\" },\n" +
+    "          { key: \"city\", name: \"City\", type:\"list\", options: [{id:'ny', name:'New York'}, {id:'tp', name:'Taipei'}], required:true },\n" +
+    "          { key: \"emailAddress\", name: \"E-Mail\", placeholder: \"E-Mail...\" },\n" +
+    "          { key: \"job\", name: \"Job\", placeholder: \"Job...\" },\n" +
+    "          { key: \"sd\", name: \"Start Date\", placeholder: \"sds\", type:\"date\", required:true },\n" +
+    "          { key: \"ed\", name: \"End Date\", placeholder: \"eds\", type:\"date\", required:true }\n" +
+    "        ];\n" +
+    "          var now =  new Date($filter(\"date\")(Date.now(), 'yyyy-MM-dd'));\n" +
+    "          $scope.defaultParams = {\n" +
+    "            name: 'Max M.',\n" +
+    "            city: {id:'tp', name:'Taipei'},\n" +
+    "            sd: now\n" +
+    "            };\n" +
+    "          $scope.search = function() {\n" +
+    "            alert(\"do search....\");\n" +
+    "          };\n" +
+    "\n" +
+    "        $scope.addPredefinedNameSearchParam = function(){\n" +
+    "          //$scope.searchParams.name = 'Max Mustermann';\n" +
+    "          $scope.searchParams.sd = now;\n" +
+    "        };\n" +
+    "\n" +
+    "        $scope.loadPredefinedSearchParamSet = function(){\n" +
+    "          $scope.defaultParams = {\n" +
+    "            name: \"Max M.\",\n" +
+    "            sd: (new Date(\"2015-09-21\"))\n" +
+    "          };\n" +
+    "        };\n" +
+    "      \n" +
+    "      });</script></head><body><nav class=\"navbar navbar-inverse navbar-fixed-top\" role=navigation><div class=container><div class=navbar-header><button type=button class=\"navbar-toggle collapsed\" data-toggle=collapse data-target=#navbar aria-expanded=false aria-controls=navbar><span class=sr-only>Toggle navigation</span> <span class=icon-bar></span> <span class=icon-bar></span> <span class=icon-bar></span></button> <a class=navbar-brand href=#>Angular Advanced Searchbox</a></div><div id=navbar class=\"navbar-collapse collapse\"></div></div></nav><div class=container ng-controller=DemoController><div class=jumbotron><h1>Angular Advanced Searchbox</h1><p>A directive for AngularJS providing a advanced visual search box.</p><p><a class=\"btn btn-primary btn-lg\" href=https://github.com/dnauck/angular-advanced-searchbox/archive/master.zip role=button><span class=\"fa fa-download\"></span> Download</a> <a class=\"btn btn-default btn-lg\" href=https://github.com/dnauck/angular-advanced-searchbox role=button><span class=\"fa fa-github\"></span> Github</a></p></div><div class=row><div class=col-sm-12><h2>Demo</h2><p>Click on a suggested search parameter or use autocompletion feature and press 'Enter' to add new search parameter to your query. Use 'TAB', 'SHIFT+TAB', 'LEFT', 'RIGHT' or 'BACKSPACE' to navigate between search parameters.</p><nit-advanced-searchbox ng-model=searchParams parameters=availableSearchParams defaultparams=defaultParams placeholder=Search... enter=search></nit-advanced-searchbox><p><strong>Output:</strong><pre><code>{{searchParams}}</code></pre><pre><code>{{searchParams.sd | date: \"yyyy-MM-dd\"}}</code></pre>The output model could be directly used as params object for Angular's $http API.</p><p><strong>Test:</strong> loading predefined search parameters via code:<br><button class=\"btn btn-info\" ng-click=addPredefinedNameSearchParam()>Add predefined \"Name\" Search Parameter</button> <button class=\"btn btn-info\" ng-click=loadPredefinedSearchParamSet()>Load predefined Search Parameter Set</button></p></div><div class=col-sm-12><h2>Getting started</h2><p>Define the available search parameters in your controller's code:</p><p><pre><code>\n" +
+    "            {{availableSearchParams |json}}\n" +
+    "</code></pre></p><p>Add the following AngularJS directive to your HTML:</p><p><pre><code>&#60;nit-advanced-searchbox ng-model=\"searchParams\" parameters=\"availableSearchParams\" placeholder=\"Search...\"&#62;&#60;/nit-advanced-searchbox&#62;</code></pre></p><p><a class=\"btn btn-default\" href=https://github.com/dnauck/angular-advanced-searchbox/blob/master/README.md role=button>View Readme &raquo;</a></p></div></div><hr><footer><p>&copy; Nauck IT KG 2014, 2015</p></footer></div></body></html>"
   );
 
 }]);

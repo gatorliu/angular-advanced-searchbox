@@ -1,28 +1,17 @@
 ## Angular Advanced Searchbox
-[![Build Status](https://travis-ci.org/dnauck/angular-advanced-searchbox.png?branch=master)](https://travis-ci.org/dnauck/angular-advanced-searchbox)
 
-A directive for AngularJS providing a advanced visual search box.
+A directive for AngularJS providing a advanced visual search box  
+Forked from https://github.com/dnauck/angular-advanced-searchbox 
+and Add some features.
 
-### [DEMO](http://dnauck.github.io/angular-advanced-searchbox/)
+### [DEMO](http://gatorliu.github.io/angular-advanced-searchbox/)
+
+### Features
+1. add `required` attribute in availableSearchParams ( also must set defaultParams)
+1. add `type` attribute in availableSearchParams ( type may one of  `text`, `list`, `date`)
+   * date type only work Chrome and IE11+ (HTML5 input type date support)
 
 ### Usage
-
-Include with bower
-
-```sh
-bower install angular-advanced-searchbox
-```
-
-The bower package contains files in the ```dist/```directory with the following names:
-
-- angular-advanced-searchbox.js
-- angular-advanced-searchbox.min.js
-- angular-advanced-searchbox-tpls.js
-- angular-advanced-searchbox-tpls.min.js
-
-Files with the ```min``` suffix are minified versions to be used in production. The files with ```-tpls``` in their name have the directive template bundled. If you don't need the default template use the ```angular-paginate-anything.min.js``` file and provide your own template with the ```templateUrl``` attribute.
-
-Load the javascript and css and declare your Angular dependency
 
 ```html
 <link rel="stylesheet" href="bower_components/angular-advanced-searchbox/dist/angular-advanced-searchbox.min.css">
@@ -38,11 +27,21 @@ Define the available search parameters in your controller:
 ```js
 $scope.availableSearchParams = [
           { key: "name", name: "Name", placeholder: "Name..." },
-          { key: "city", name: "City", placeholder: "City..." },
-          { key: "country", name: "Country", placeholder: "Country..." },
+          { key: "city", name: "City", type:"list", options: [{id:'ny', name:'New York'}, {id:'tp', name:'Taipei'}], required:true },
           { key: "emailAddress", name: "E-Mail", placeholder: "E-Mail..." },
-          { key: "job", name: "Job", placeholder: "Job..." }
-        ];
+          { key: "job", name: "Job", placeholder: "Job..." },
+          { key: "sd", name: "Start Date", placeholder: "sds", type:"date", required:true },
+          { key: "ed", name: "End Date", placeholder: "eds", type:"date", required:true }
+];
+$scope.defaultParams = {
+   name: "Max M.",
+   city: {id:'tp', name:'Taipei'},
+   sd: new Date($filter("date")(Date.now(), 'yyyy-MM-dd'))
+};
+$scope.search = function() {
+   alert("do search....");
+};
+
 ```
 
 Then in your view
@@ -51,45 +50,7 @@ Then in your view
 <nit-advanced-searchbox
 	ng-model="searchParams"
 	parameters="availableSearchParams"
-	placeholder="Search...">
+	placeholder="Search..."
+	enter="search">
 </nit-advanced-searchbox>
 ```
-
-The `angular-advanced-searchbox` directive uses an external template stored in
-`angular-advanced-searchbox.html`.  Host it in a place accessible to
-your page and set the `template-url` attribute. Note that the `url`
-param can be a scope variable as well as a hard-coded string.
-
-### Benefits
-
-* Handles free text search and/or parameterized searches
-* Provides suggestions on available search parameters
-* Easy to use with mouse or keyboard
-* Model could easily be used as ```params``` for Angular's ```$http``` API
-* Twitter Bootstrap compatible markup
-* Works perfectly together with [angular-paginate-anything](https://github.com/begriffs/angular-paginate-anything) (use ```ng-model``` as ```url-params```)
-
-### Directive Attributes
-
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>ng-model</td>
-      <td>Search parameters as object that could be used as <i>params</i> with Angular's <i>$http</i> API.</td>
-    </tr>
-    <tr>
-      <td>parameters</td>
-      <td>List of available parameters to search for.</td>
-    </tr>
-    <tr>
-      <td>placeholder</td>
-      <td>specifies a short hint in the search box</td>
-    </tr>
-  </tbody>
-</table>

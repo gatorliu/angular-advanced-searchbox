@@ -12,3 +12,5 @@ bower_components
 
 tmp
 .idea
+
+src/demo.html
