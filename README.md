@@ -1,4 +1,5 @@
 ## Another Angular Advanced Searchbox
+[![Build Status](https://travis-ci.org/gatorliu/angular-advanced-searchbox.png?branch=master)](https://travis-ci.org/gatorliu/angular-advanced-searchbox)
 
 A directive for AngularJS providing a advanced visual search box  
 Forked from [Dnauck's project](https://github.com/dnauck/angular-advanced-searchbox) 
