@@ -78,7 +78,7 @@ angular.module('angular-advanced-searchbox', [])
 
                     $scope.isDefault = function () {
                         return angular.equals($scope.defaultparams, $scope.model);
-                    }
+                    };
                     $scope.searchParamValueChanged = function (param) {
                         updateModel('change', param.key, param.value);
                     };
