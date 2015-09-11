@@ -1,4 +1,4 @@
-## Angular Advanced Searchbox
+## Another Angular Advanced Searchbox
 
 A directive for AngularJS providing a advanced visual search box  
 Forked from https://github.com/dnauck/angular-advanced-searchbox 
@@ -6,7 +6,7 @@ and Add some features.
 
 ### [DEMO](http://gatorliu.github.io/angular-advanced-searchbox/)
 
-### Features
+### New Features
 1. add `required` attribute in availableSearchParams ( also must set defaultParams)
 1. add `type` attribute in availableSearchParams ( type may one of  `text`, `list`, `date`)
    * date type only work Chrome and IE11+ (HTML5 input type date support)
