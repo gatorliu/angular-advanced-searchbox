@@ -1,8 +1,8 @@
 ## Another Angular Advanced Searchbox
 
 A directive for AngularJS providing a advanced visual search box  
-Forked from https://github.com/dnauck/angular-advanced-searchbox 
-and Add some features.
+Forked from [Dnauck's project](https://github.com/dnauck/angular-advanced-searchbox) 
+and added some features.
 
 ### [DEMO](http://gatorliu.github.io/angular-advanced-searchbox/)
 
