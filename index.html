@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html ng-app="app" lang="en">
   <head>
@@ -41,7 +39,7 @@
           { key: "ed", name: "End Date", placeholder: "eds", type:"date", required:true }
         ];
           $scope.defaultParams = {
-            name: 'Gator Liu.',
+            name: "Max M.",
             city: {id:'tp', name:'Taipei'},
             sd: new Date($filter("date")(Date.now(), 'yyyy-MM-dd'))
             };
@@ -56,8 +54,8 @@
         $scope.loadPredefinedSearchParamSet = function(){
           $scope.defaultParams = {
             name: "Max M.",
-            city: {id:'ny', name:'New York'},
-            sd: (new Date("2005-08-17"))
+            city: {id:'tp', name:'Taipei'},
+            sd: new Date($filter("date")(Date.now(), 'yyyy-MM-dd'))
           };
         };
       
@@ -76,7 +74,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="https://github.com/dnauck/angular-advanced-searchbox"  target='_blank'>Another Angular Advanced Searchbox( Fork form Dnauck's)</a>
+          <a class="navbar-brand" href="https://github.com/dnauck/angular-advanced-searchbox"  target='_blank'>Another Angular Advanced Searchbox( Forked form Dnauck's)</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
 
@@ -88,15 +86,15 @@
       <div class="jumbotron">
 
         <h1>Another Angular Advanced Searchbox</h1>
-        <p>A directive for AngularJS providing a advanced visual search box. <br />(fork from <a href='https://github.com/dnauck/angular-advanced-searchbox' target='_blank'>https://github.com/dnauck/angular-advanced-searchbox</a>)</p>
+        <p>A directive for AngularJS providing a advanced visual search box. <br />(Forked from <a href='https://github.com/dnauck/angular-advanced-searchbox' target='_blank'>https://github.com/dnauck/angular-advanced-searchbox</a>)</p>
 <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post" name="donateform">
           <a class="btn btn-primary btn-lg" href="https://github.com/gatorliu/angular-advanced-searchbox/archive/master.zip" role="button"><span class="fa fa-download"></span> Download</a>
           <a class="btn btn-default btn-lg" href="https://github.com/gatorliu/angular-advanced-searchbox" role="button"><span class="fa fa-github"></span> Github</a>
 <input type="hidden" name="cmd" value="_s-xclick">
 <input type="hidden" name="hosted_button_id" value="5R3T7PLQSAY9E">
 <!-- input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" -->
-          <a class="btn btn-default btn-lg" href="javascript: document.donateform.submit()" role="button"><span class="fa fa-paypal"></span> Donate</a>
-<!-- <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"> -->
+          <a class="btn btn-warning btn-lg" href="javascript: document.donateform.submit()" role="button"><span class="fa fa-paypal"></span> Donate by Paypal</a>
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 </form>
 
       </div>
@@ -131,7 +129,7 @@ $scope.availableSearchParams = [
    { key: "ed", name: "End Date", placeholder: "eds", type:"date", required:true }
 ];
  $scope.defaultParams = {
-   name: 'Gator Liu.',
+   name: "Max M.",
    city: {id:'tp', name:'Taipei'},
    sd: new Date($filter("date")(Date.now(), 'yyyy-MM-dd'))
    };
