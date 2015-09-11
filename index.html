@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html ng-app="app" lang="en">
   <head>
@@ -9,7 +10,7 @@
     <meta name="author" content="Daniel Nauck">
     <link rel="icon" href="favicon.ico">
 
-    <title>Angular Advanced Searchbox</title>
+    <title>Another Angular Advanced Searchbox</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
@@ -20,35 +21,46 @@
     <link rel="stylesheet" href="angular-advanced-searchbox.min.css">
 
 
-    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
     <script src="https://rawgit.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.13.0.min.js"></script>
-    <script src="angular-advanced-searchbox.js"></script>
+    <script src="angular-advanced-searchbox.min.js"></script>
 
 
     <script type="text/javascript">
       var app = angular.module('app', ['ui.bootstrap', 'angular-advanced-searchbox']);
 
 
-      app.controller('DemoController', function($scope) {
+      app.controller('DemoController', function($scope, $filter) {
         $scope.availableSearchParams = [
           { key: "name", name: "Name", placeholder: "Name..." },
-          { key: "city", name: "City", placeholder: "City..." },
-          { key: "country", name: "Country", placeholder: "Country..." },
+          { key: "city", name: "City", type:"list", options: [{id:'ny', name:'New York'}, {id:'tp', name:'Taipei'}], required:true },
           { key: "emailAddress", name: "E-Mail", placeholder: "E-Mail..." },
-          { key: "job", name: "Job", placeholder: "Job..." }
+          { key: "job", name: "Job", placeholder: "Job..." },
+          { key: "sd", name: "Start Date", placeholder: "sds", type:"date", required:true },
+          { key: "ed", name: "End Date", placeholder: "eds", type:"date", required:true }
         ];
+          $scope.defaultParams = {
+            name: 'Gator Liu.',
+            city: {id:'tp', name:'Taipei'},
+            sd: new Date($filter("date")(Date.now(), 'yyyy-MM-dd'))
+            };
+          $scope.search = function() {
+            alert("do search....:\n  search_key = " + JSON.stringify($scope.searchParams)  );
+          };
 
         $scope.addPredefinedNameSearchParam = function(){
           $scope.searchParams.name = 'Max Mustermann';
         };
 
         $scope.loadPredefinedSearchParamSet = function(){
-          $scope.searchParams = {
+          $scope.defaultParams = {
             name: "Max M.",
-            job: "Boss"
+            city: {id:'ny', name:'New York'},
+            sd: (new Date("2005-08-17"))
           };
         };
+      
       });
     </script>
   </head>
@@ -64,7 +76,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Angular Advanced Searchbox</a>
+          <a class="navbar-brand" href="https://github.com/dnauck/angular-advanced-searchbox"  target='_blank'>Another Angular Advanced Searchbox( Fork form Dnauck's)</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
 
@@ -75,11 +87,11 @@
     <div class="container" ng-controller="DemoController">
       <div class="jumbotron">
 
-        <h1>Angular Advanced Searchbox</h1>
-        <p>A directive for AngularJS providing a advanced visual search box.</p>
+        <h1>Another Angular Advanced Searchbox</h1>
+        <p>A directive for AngularJS providing a advanced visual search box. <br />(fork from <a href='https://github.com/dnauck/angular-advanced-searchbox' target='_blank'>https://github.com/dnauck/angular-advanced-searchbox</a>)</p>
         <p>
-          <a class="btn btn-primary btn-lg" href="https://github.com/dnauck/angular-advanced-searchbox/archive/master.zip" role="button"><span class="fa fa-download"></span> Download</a>
-          <a class="btn btn-default btn-lg" href="https://github.com/dnauck/angular-advanced-searchbox" role="button"><span class="fa fa-github"></span> Github</a>
+          <a class="btn btn-primary btn-lg" href="https://github.com/gatorliu/angular-advanced-searchbox/archive/master.zip" role="button"><span class="fa fa-download"></span> Download</a>
+          <a class="btn btn-default btn-lg" href="https://github.com/gatorliu/angular-advanced-searchbox" role="button"><span class="fa fa-github"></span> Github</a>
         </p>
 
       </div>
@@ -88,7 +100,7 @@
         <div class="col-sm-12">
           <h2>Demo</h2>
           <p>Click on a suggested search parameter or use autocompletion feature and press 'Enter' to add new search parameter to your query. Use 'TAB', 'SHIFT+TAB', 'LEFT', 'RIGHT' or 'BACKSPACE' to navigate between search parameters.</p>
-          <nit-advanced-searchbox ng-model="searchParams" parameters="availableSearchParams" placeholder="Search..."></nit-advanced-searchbox>
+          <nit-advanced-searchbox ng-model="searchParams" parameters="availableSearchParams" defaultparams="defaultParams" placeholder="Search..." enter="search"></nit-advanced-searchbox>
           <p>
             <strong>Output:</strong>
             <pre><code>{{searchParams}}</code></pre>
@@ -104,27 +116,40 @@
           <h2>Getting started</h2>
           <p>Define the available search parameters in your controller's code:</p>
           <p>
-            <pre><code>$scope.availableSearchParams = [
-  { key: "name", name: "Name", placeholder: "Name..." },
-  { key: "city", name: "City", placeholder: "City..." },
-  { key: "country", name: "Country", placeholder: "Country..." },
-  { key: "emailAddress", name: "E-Mail", placeholder: "E-Mail..." },
-  { key: "job", name: "Job", placeholder: "Job..." }
-];</code></pre>
+            <pre><code>
+$scope.availableSearchParams = [
+   { key: "name", name: "Name", placeholder: "Name..." },
+   { key: "city", name: "City", type:"list", options: [{id:'ny', name:'New York'}, {id:'tp', name:'Taipei'}], required:true },
+   { key: "emailAddress", name: "E-Mail", placeholder: "E-Mail..." },
+   { key: "job", name: "Job", placeholder: "Job..." },
+   { key: "sd", name: "Start Date", placeholder: "sds", type:"date", required:true },
+   { key: "ed", name: "End Date", placeholder: "eds", type:"date", required:true }
+];
+ $scope.defaultParams = {
+   name: 'Gator Liu.',
+   city: {id:'tp', name:'Taipei'},
+   sd: new Date($filter("date")(Date.now(), 'yyyy-MM-dd'))
+   };
+ $scope.search = function() {
+   alert("do search....:\n  search_key = " + JSON.stringify($scope.searchParams)  );
+ }:
+            </code></pre>
           </p>
           <p>Add the following AngularJS directive to your HTML:</p>
           <p>
-            <pre><code>&#60;nit-advanced-searchbox ng-model="searchParams" parameters="availableSearchParams" placeholder="Search..."&#62;&#60;/nit-advanced-searchbox&#62;</code></pre>
+            <pre><code> &#60;nit-advanced-searchbox ng-model="searchParams" parameters="availableSearchParams" defaultparams="defaultParams" placeholder="Search..." enter="search"&#62;&#60;/nit-advanced-searchbox&#62; </code></pre>
+
           </p>
-          <p><a class="btn btn-default" href="https://github.com/dnauck/angular-advanced-searchbox/blob/master/README.md" role="button">View Readme &raquo;</a></p>
+          <p><a class="btn btn-default" href="https://github.com/gatorliu/angular-advanced-searchbox/blob/master/README.md" role="button">View Readme &raquo;</a></p>
        </div>
       </div>
 
       <hr>
 
       <footer>
-        <p>&copy; Nauck IT KG 2014, 2015</p>
+        <p>&copy; Gator Liu 2015</p>
       </footer>
     </div> <!-- /container -->
   </body>
 </html>
+
