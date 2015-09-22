@@ -79,6 +79,21 @@ angular.module('angular-advanced-searchbox', [])
                     $scope.isDefault = function () {
                         return angular.equals($scope.defaultparams, $scope.model);
                     };
+                    $scope.idxOfList = function (Arr, elm) {
+                        var ret = Arr.indexOf(elm);
+                        if (ret >= 0 ) {
+                           return ret;
+                        } else { 
+                           ret = 0;
+                           for (var k in Arr){
+                              if (angular.equals(elm,Arr[k]))  {
+                                 return ret;
+                              }
+                              ret += 1;
+                           }
+                           return -1;
+                        }
+                    };
                     $scope.searchParamValueChanged = function (param) {
                         updateModel('change', param.key, param.value);
                     };
