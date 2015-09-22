@@ -181,24 +181,26 @@ angular.module('angular-advanced-searchbox', [])
                     };
 
                     $scope.editPrevious = function(currentIndex) {
-                        if (currentIndex !== undefined)
-                            $scope.leaveEditMode(currentIndex);
+                        //if (currentIndex !== undefined)
+                        //    $scope.leaveEditMode(currentIndex);
 
                         //TODO: check if index == 0 -> what then?
                         //console.log(currentIndex)
-                        if (currentIndex > 0) {
+                        if (currentIndex === undefined && $scope.searchParams.length > 0) {
+                            $scope.enterEditMode($scope.searchParams.length - 1);
+                        } else if (currentIndex > 0) {
                             $scope.enterEditMode(currentIndex - 1);
                         //} else if (currentIndex === undefined) {
                         //    $scope.enterEditMode($scope.searchParams.length - 1);
                         } else if ($scope.searchParams.length > 0) {
-                            $scope.enterEditMode($scope.searchParams.length - 1);
-                        //    $scope.setSearchFocus = true;
+                            $scope.setSearchFocus = true;
                         }
                     };
 
                     $scope.editNext = function(currentIndex) {
-                        if (currentIndex === undefined)
+                        if (currentIndex === undefined) {
                             return;
+                        }
 
                         $scope.leaveEditMode(currentIndex);
 
@@ -335,6 +337,7 @@ angular.module('angular-advanced-searchbox', [])
             return {
                 restrict: 'A',
                 link: function($scope, $element, $attrs) {
+                   console.log($attrs)
                     var model = $parse($attrs.nitSetFocus);
                     $scope.$watch(model, function(value) {
                         if (value === true) {
