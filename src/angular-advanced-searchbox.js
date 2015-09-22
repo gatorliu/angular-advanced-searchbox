@@ -347,6 +347,15 @@ angular.module('angular-advanced-searchbox', [])
                         }
                     });
                     $element.bind('blur', function() {
+                       try {
+                           if ($attrs.name != 'searchbox') {
+                              var index = $scope.searchParams.length-1;
+                              var searchParam= $scope.searchParams[$scope.searchParams.length-1];
+                              if (!searchParam.value)
+                                 $scope.removeSearchParam(index);
+                           }
+                       } catch (e) {}
+
                         $scope.$apply(model.assign($scope, false));
                     });
                 }
