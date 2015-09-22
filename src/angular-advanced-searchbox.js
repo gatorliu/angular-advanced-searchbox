@@ -337,7 +337,6 @@ angular.module('angular-advanced-searchbox', [])
             return {
                 restrict: 'A',
                 link: function($scope, $element, $attrs) {
-                   console.log($attrs)
                     var model = $parse($attrs.nitSetFocus);
                     $scope.$watch(model, function(value) {
                         if (value === true) {
