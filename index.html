@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A directive for AngularJS providing a advanced visual search box">
     <meta name="author" content="Gator Liu">
-    <link rel="icon" href="favicon.ico">
+    <!-- link rel="icon" href="favicon.ico" -->
 
     <title>Another Angular Advanced Searchbox</title>
 
@@ -107,7 +107,7 @@
           -->
       </div>
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<!-- RWD_type-文字與多媒體＿style-極簡主義 -->
+<!-- another-angular-advanced-searchbox -->
 <ins class="adsbygoogle"
      style="display:block"
      data-ad-client="ca-pub-0427036105107837"
@@ -118,7 +118,9 @@
 </script>
       <div class="row">
         <div class="col-sm-12">
-          <h2>Demo</h2>
+           <h2>Demo
+         <a href="https://travis-ci.org/gatorliu/angular-advanced-searchbox" target="_blank"><img src="https://travis-ci.org/gatorliu/angular-advanced-searchbox.svg?branch=master"></a>
+           </h2>
           <p>Click on a suggested search parameter or use autocompletion feature and press 'Enter' to add new search parameter to your query. Use 'TAB', 'SHIFT+TAB', 'LEFT', 'RIGHT' or 'BACKSPACE' to navigate between search parameters. Using 'Enter' to Submit.</p>
           <nit-advanced-searchbox ng-model="searchParams" parameters="availableSearchParams" defaultparams="defaultParams" placeholder="Search..." enter="search"></nit-advanced-searchbox>
           <p>
@@ -143,7 +145,7 @@ $scope.availableSearchParams = [
    { key: "emailAddress", name: "E-Mail", placeholder: "E-Mail..." },
    { key: "job", name: "Job", placeholder: "Job..." },
    { key: "sd", name: "Start Date", placeholder: "sds", type:"date", required:true },
-   { key: "ed", name: "End Date", placeholder: "eds", type:"date", required:true }
+   { key: "ed", name: "End Date", placeholder: "eds", type:"date"}
 ];
  $scope.defaultParams = {
    name: "Max M.",
