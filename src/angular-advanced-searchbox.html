@@ -40,8 +40,8 @@
                           ng-change="searchParamValueChanged(searchParam)"
                           ng-model="searchParam.value" 
                           ng-options="m.cname || m.name for m in searchParam.options"
+                          ng-init="searchParam.value = searchParam.options[idxOfList(searchParam.options, searchParam.value)]" 
                           />
-                          <!-- ng-init="searchParam.value = searchParam.options[0]" -->
                           
                      </select>
              </div>
